@@ -3,7 +3,7 @@
  * (c) 2014 Blendle <rick@blendle.nl>
  * sparta may be freely distributed under the MIT license.
  */
-module.exports = (function (require) {
+define(function (require) {
 	'use strict';
 
 	var _ = require('underscore');
@@ -11,17 +11,104 @@ module.exports = (function (require) {
 
 	var globalSpartaOptions = {};
 
+	var uniqid = 0,
+		jsonpLastValue = null,
+		jsonpLoaded = 0,
+		jsonpCallbackPrefix = 'sparta_' + (+new Date()),
+		head = document.getElementsByTagName('head')[0];
+
 	function Sparta (options) {
 		/**
 		 * This function can be called to abort the XHR request
 		 */
-		var abort = function() {
+		var abortXHR = function () {
 			this.abort();
 		};
+
+		/**
+		 * abort a JSONP request
+		 */
+		var abortJSONP = function (script) {
+			script.onload = script.onreadystatechange = null;
+			head.removeChild(script);
+
+			jsonpLastValue = null;
+			jsonpLoaded = 1; // Act like we already did.
+		};
+
+		/**
+		 * Store JSONP return data
+		 */
+		var jsonpCallback = function (data) {
+			jsonpLastValue = data;
+		};
+
+
+		var jsonp = function (options, deferred) {
+			var requestId = uniqid++,
+				url = options.url,
+				cbKey = options.jsonpCallback || 'callback',
+				cbVal = options.jsonpCallbackName || jsonpCallbackPrefix + requestId,
+				cbRegExp = new RegExp('((^|\\?|&)' + cbKey + ')=([^&]+)'),
+				cbMatch = url.match(cbRegExp),
+				script = document.createElement('script');
+
+
+			// Determine callback
+			if (cbMatch) {
+				if (cbMatch[3] === '?') {
+					url = url.replace(cbRegExp, '$1=' + cbVal); // wildcard callback func name
+				} else {
+					cbVal = cbMatch[3]; // provided callback func name
+				}
+			} else {
+				// no callback details, add 'em
+				url = url + (/\?/.test(url) ? '&' : '?') + (cbKey + '=' + cbVal);
+			}
+
+			// make callback available
+			window[cbVal] = jsonpCallback;
+
+			// setup script tag and it's readystate
+			script.type = 'text/javascript';
+			script.src = url;
+			script.async = options.async !== undefined ? options.async : true;
+			script.onload = script.onreadystatechange = function () {
+				if ((script.readyState && script.readyState !== 'complete' && script.readyState !== 'loaded') || loaded) {
+					return false;
+				}
+
+				script.onload = script.onreadystatechange = null;
+
+				// Resolve promise with data
+				deferred.resolve(jsonpLastValue);
+
+				jsonpLastValue = null;
+				head.removeChild(script);
+				jsonpLoaded = 1;
+			};
+
+			// Add the script to the DOM head
+			head.appendChild(script);
+
+			// make promise abortable
+			var extendedPromise = _.extend(deferred.promise, {
+				abort: abortJSONP.bind(this, script)
+			});
+
+			return extendedPromise;
+		};
+
 
 		return (function(options) {
 			// Set up deferred
 			var deferred = sparta.deferred && sparta.deferred();
+
+			// handle jsonp
+			if (options.jsonp) {
+				return jsonp(options, deferred);
+			}
+
 			var req = new XMLHttpRequest();
 
 			// Set up defaults
@@ -152,7 +239,7 @@ module.exports = (function (require) {
 			req.send(options.data || void 0);
 
 			var extendedPromise = _.extend(deferred.promise, {
-				abort: abort.bind(req)
+				abort: abortXHR.bind(req)
 			});
 
 			return extendedPromise;
@@ -164,9 +251,9 @@ module.exports = (function (require) {
 	}
 
 	sparta.ajaxDefaults = function (options) {
-		options = options || {}
+		options = options || {};
 		for (var k in options) {
-			globalSpartaOptions[k] = options[k]
+			globalSpartaOptions[k] = options[k];
 		}
 	};
 
@@ -174,7 +261,7 @@ module.exports = (function (require) {
 		return Q.defer();
 	};
 
-	sparta.handleParseError = function (response, options) {}
+	sparta.handleParseError = function (response, options) {};
 
 	return sparta;
-})(require);
+});
