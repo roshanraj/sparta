@@ -74,7 +74,7 @@ define(function (require) {
 			script.src = url;
 			script.async = options.async !== undefined ? options.async : true;
 			script.onload = script.onreadystatechange = function () {
-				if ((script.readyState && script.readyState !== 'complete' && script.readyState !== 'loaded') || loaded) {
+				if ((script.readyState && script.readyState !== 'complete' && script.readyState !== 'loaded') || jsonpLoaded) {
 					return false;
 				}
 
