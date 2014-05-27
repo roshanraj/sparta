@@ -95,18 +95,7 @@ module.exports = (function (require) {
 						try {
 							data = JSON.parse(this.response);
 						} catch(err) {
-							window.ErrorLogger.captureMessage(
-								'JSON Parse Error on server data: ' + this.response,
-								{
-									tags: {
-										type: options.type
-									},
-									extra: {
-										serverUrl: options.url,
-										statusCode: options.status
-									}
-								}
-							);
+							sparta.handleParseError(this.response, options);
 						}
 					}
 					else if (xmlResponseType.test(contentType)) {
@@ -184,6 +173,8 @@ module.exports = (function (require) {
 	sparta.deferred = function () {
 		return Q.defer();
 	};
+
+	sparta.handleParseError = function (options) {}
 
 	return sparta;
 })(require);
