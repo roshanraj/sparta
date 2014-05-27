@@ -174,7 +174,7 @@ module.exports = (function (require) {
 		return Q.defer();
 	};
 
-	sparta.handleParseError = function (options) {}
+	sparta.handleParseError = function (response, options) {}
 
 	return sparta;
 })(require);
