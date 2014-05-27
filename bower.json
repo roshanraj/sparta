@@ -1,0 +1,24 @@
+{
+  "name": "sparta",
+  "version": "0.0.1",
+  "homepage": "https://github.com/blendle/sparta",
+  "authors": [
+    "Rick Pastoor <rick@blendle.nl>"
+  ],
+  "description": "Supremely Powerful Advanced Revolutionary Turbo Ajax",
+  "main": "sparta.js",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "ajax"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
