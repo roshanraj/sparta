@@ -1,4 +1,4 @@
 sparta
 ======
 
-Supremely Powerful Asynchronous Replacement Technology for Ajax
+Supremely Powerful Advanced Revolutionary Turbo Ajax
