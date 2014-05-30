@@ -1,13 +1,24 @@
 /*!
- * sparta.js 0.0.1
+ * sparta.js 0.0.2
  * (c) 2014 Blendle <rick@blendle.nl>
  * sparta may be freely distributed under the MIT license.
  */
-define(function (require) {
-	'use strict';
+ (function(root, factory) {
+	// Set up sparta in the right environment. Start with AMD.
+	if (typeof define === 'function' && define.amd) {
+		define(['underscore', 'q', 'exports'], function(_, Q, exports) {
+			exports = factory(_, Q);
+		});
 
-	var _ = require('underscore');
-	var Q = require('q');
+	// Next for Node.js or CommonJS
+	} else if (typeof exports !== 'undefined') {
+		var Q;
+		try { Q = require('q'); } catch(e) { }
+		module.exports = factory(require('underscore'), Q, exports);
+	}
+
+}(this, function (_, Q) {
+	'use strict';
 
 	var globalSpartaOptions = {};
 
@@ -258,10 +269,14 @@ define(function (require) {
 	};
 
 	sparta.deferred = function () {
-		return Q.defer();
+		if (Q) {
+			return Q.defer();
+		} else {
+			throw new Error('Please define your own deferred library by implementing sparta.deferred()');
+		}
 	};
 
 	sparta.handleParseError = function (response, options) {};
 
 	return sparta;
-});
+}));
