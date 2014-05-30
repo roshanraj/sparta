@@ -3,22 +3,21 @@
  * (c) 2014 Blendle <rick@blendle.nl>
  * sparta may be freely distributed under the MIT license.
  */
- (function(root, factory) {
-	// Set up sparta in the right environment. Start with AMD.
-	if (typeof define === 'function' && define.amd) {
-		define(['underscore', 'q', 'exports'], function(_, Q, exports) {
-			exports = factory(_, Q);
-		});
-
-	// Next for Node.js or CommonJS
-	} else if (typeof exports !== 'undefined') {
-		var Q;
-		try { Q = require('q'); } catch(e) { }
-		module.exports = factory(require('underscore'), Q, exports);
-	}
-
+ (function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['underscore', 'q'], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory(require('underscore'), require('q'));
+    } else {
+        // Browser globals (root is window)
+        root.returnExports = factory(root._, root.Q);
+    }
 }(this, function (_, Q) {
-	'use strict';
+    'use strict';
 
 	var globalSpartaOptions = {};
 
@@ -111,7 +110,7 @@
 		};
 
 
-		return (function(options) {
+		return function(options) {
 			// Set up deferred
 			var deferred = sparta.deferred && sparta.deferred();
 
@@ -254,7 +253,7 @@
 			});
 
 			return extendedPromise;
-		})(options);
+		}(options);
 	}
 
 	function sparta (options) {
@@ -262,18 +261,11 @@
 	}
 
 	sparta.ajaxDefaults = function (options) {
-		options = options || {};
-		for (var k in options) {
-			globalSpartaOptions[k] = options[k];
-		}
+		globalSpartaOptions = _.extend(globalSpartaOptions || {}, options);
 	};
 
 	sparta.deferred = function () {
-		if (Q) {
-			return Q.defer();
-		} else {
-			throw new Error('Please define your own deferred library by implementing sparta.deferred()');
-		}
+		return Q.defer();
 	};
 
 	sparta.handleParseError = function (response, options) {};
