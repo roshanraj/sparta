@@ -1,5 +1,5 @@
 /*!
- * sparta.js 0.0.2
+ * sparta.js 0.0.3
  * (c) 2014 Blendle <rick@blendle.nl>
  * sparta may be freely distributed under the MIT license.
  */
@@ -138,6 +138,8 @@
 			if (options.contentType) {
 				if (!options.headers) options.headers = {};
 				options.headers['Content-Type'] = options.contentType;
+			} else {
+				delete options.headers['Content-Type'];
 			}
 
 			if (!options.successStatusCodes) {
@@ -218,6 +220,7 @@
 				this.onreadystatechange = null;
 				this.onabort = null;
 				this.onerror = null;
+				this.ontimeout = null;
 			};
 
 			// Listen to abort changes
@@ -231,6 +234,7 @@
 				this.onreadystatechange = null;
 				this.onabort = null;
 				this.onerror = null;
+				this.ontimeout = null;
 			};
 
 			// Listen to errors
@@ -244,6 +248,22 @@
 				this.onreadystatechange = null;
 				this.onabort = null;
 				this.onerror = null;
+				this.ontimeout = null;
+			};
+
+			// Listen to timeouts
+			req.ontimeout = function() {
+				deferred.reject({
+					data: null,
+					statusCode: -2,
+					statusText: 'timeout'
+				});
+
+				// Remove listeners
+				this.onreadystatechange = null;
+				this.onabort = null;
+				this.onerror = null;
+				this.ontimeout = null;
 			};
 
 			req.send(options.data || void 0);
