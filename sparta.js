@@ -23,11 +23,12 @@
 
 	var uniqid = 0,
 		jsonpLastValue = null,
-		jsonpLoaded = 0,
 		jsonpCallbackPrefix = 'sparta_' + (+new Date()),
 		head = document.getElementsByTagName('head')[0];
 
 	function Sparta (options) {
+		var jsonpLoaded = 0;
+
 		/**
 		 * This function can be called to abort the XHR request
 		 */
