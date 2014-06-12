@@ -1,5 +1,5 @@
 /*!
- * sparta.js 0.0.3
+ * sparta.js 0.0.4
  * (c) 2014 Blendle <rick@blendle.nl>
  * sparta may be freely distributed under the MIT license.
  */

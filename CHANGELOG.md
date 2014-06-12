@@ -1,3 +1,7 @@
+### 2014-06-12 v0.0.4
+
+* Bugfix: fixed using Sparta when issuing multiple jsonp requests
+
 ### 2014-06-03 v0.0.3
 
 * Bugfix: passing false as contentType won't send a Content-Type header
