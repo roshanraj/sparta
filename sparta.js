@@ -143,6 +143,10 @@
 				delete options.headers['Content-Type'];
 			}
 
+			if (options.accept) {
+				options.headers['Accept'] = options.accept;
+			}
+
 			if (!options.successStatusCodes) {
 				options.successStatusCodes = [200, 201, 202, 204, 304];
 			}
