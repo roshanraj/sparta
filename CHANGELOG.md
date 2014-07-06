@@ -1,3 +1,6 @@
+### 2014-07-6 v0.0.5
+* Added accept support
+
 ### 2014-06-12 v0.0.4
 
 * Bugfix: fixed using Sparta when issuing multiple jsonp requests
